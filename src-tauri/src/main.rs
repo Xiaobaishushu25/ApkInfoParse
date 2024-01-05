@@ -2,11 +2,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod app;
 
+use app::{apk_info::ApkParsedInfo, manifest_parser::parser};
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::str::FromStr;
-use serde::{Deserialize, Serialize};
-use app::{apk_info::ApkParsedInfo, manifest_parser::parser};
-
 
 fn main() {
     tauri::Builder::default()
@@ -18,14 +17,14 @@ fn main() {
 // fn parse_by_path(path:&str) -> apk_info::ApkParsedInfo{
 // fn parse_by_path(path:&str) -> Response{
 // fn parse_by_path(path:&str) -> AppResponse{
-fn parse_by_path(path:&str) -> Result<ApkParsedInfo,ErrRes>{
-    println!("{}",path);
+fn parse_by_path(path: &str) -> Result<ApkParsedInfo, ErrRes> {
+    println!("{}", path);
     // return match parser::parse(&PathBuf::from_str(path).unwrap()).await{
-    return match parser::parse(&PathBuf::from_str(path).unwrap()){
+    return match parser::parse(&PathBuf::from_str(path).unwrap()) {
         None => {
-            Err(ErrRes{
-                code:200,
-                msg:"parse failure".to_string()
+            Err(ErrRes {
+                code: 200,
+                msg: "parse failure".to_string(),
             })
             // AppResponse(Err(ErrRes{
             //         code:200,
@@ -57,26 +56,26 @@ fn parse_by_path(path:&str) -> Result<ApkParsedInfo,ErrRes>{
     //     )
     // }
 }
-#[derive(Debug, Serialize,Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AppResponse(pub AppResult);
 // pub type AppResult = Result<ApkParsedInfo,Box<dyn std::error::Error>>;
-pub type AppResult = Result<ApkParsedInfo,ErrRes>;
-#[derive(Debug, Serialize,Deserialize)]
-pub enum Response{
+pub type AppResult = Result<ApkParsedInfo, ErrRes>;
+#[derive(Debug, Serialize, Deserialize)]
+pub enum Response {
     /// Contains the success value
     Ok(ApkParsedInfo),
 
     /// Contains the error value
     Err(ErrRes),
 }
-#[derive(Debug, Serialize,Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Res<T> {
     pub code: i32,
     pub data: T,
     pub msg: String,
 }
 
-#[derive(Debug, Serialize,Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ErrRes {
     pub code: i32,
     pub msg: String,
