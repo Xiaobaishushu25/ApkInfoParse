@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {PropType, ref} from 'vue'
 import {ApkInfo} from "../apk_info.ts";
+//这个地方类型不能简单的写ApkInfo，必须要这么写！！...！！..！！！....
 defineProps({apkInfo:Object as PropType<ApkInfo>})
 const showPermissions = ref(false)
 function togglePermissions() {
