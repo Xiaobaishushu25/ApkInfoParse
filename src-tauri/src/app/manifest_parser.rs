@@ -6,13 +6,16 @@ pub mod parser {
 
     use crate::app::android_xml::axml;
     use crate::app::apk_info::ApkParsedInfo;
+    use crate::ErrRes;
 
     // pub async fn parse(path: &PathBuf) -> Option<ApkParsedInfo> {
-    pub fn parse(path: &PathBuf) -> Option<ApkParsedInfo> {
-        let file = std::fs::File::open(path).unwrap();
+    // pub fn parse(path: &PathBuf) -> Option<ApkParsedInfo> {
+    pub fn parse(path: &PathBuf) -> Result<ApkParsedInfo,ErrRes> {
+        let file = std::fs::File::open(path).map_err(|e|ErrRes{code:200,msg:e.to_string()})?;
         let mut file_content: Vec<u8> = Vec::new();
         let mut icon = String::new();
-        let mut archive = zip::ZipArchive::new(file).unwrap();
+        // let mut archive = zip::ZipArchive::new(file).unwrap();
+        let mut archive = zip::ZipArchive::new(file).map_err(|e| ErrRes{code:200,msg:e.to_string()})?;
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
         for i in 0..archive.len() {
             let mut in_file = archive.by_index(i).unwrap();
@@ -32,11 +35,12 @@ pub mod parser {
             }
         }
 
-        let xml = axml::extract_xml(file_content);
+        let xml = axml::extract_xml(file_content).map_err(|e|ErrRes{code:200,msg:e})?;
         parse_to_info(xml, icon,file_name)
     }
 
-    fn parse_to_info(content: String, icon: String, file_name:String) -> Option<ApkParsedInfo> {
+    // fn parse_to_info(content: String, icon: String, file_name:String) -> Option<ApkParsedInfo> {
+    fn parse_to_info(content: String, icon: String, file_name:String) -> Result<ApkParsedInfo,ErrRes> {
         let mut apk_info = ApkParsedInfo::new();
 
         apk_info.icon = icon;
@@ -90,13 +94,18 @@ pub mod parser {
                     _ => {}
                 },
 
-                Err(_) => {
-                    return None;
+                Err(e) => {
+                    return Err(ErrRes{
+                        code:200,
+                        msg:e.to_string()
+                    })
+                    // return None;
                 }
 
                 _ => {}
             }
         }
-        Some(apk_info)
+        // Some(apk_info)
+        Ok(apk_info)
     }
 }

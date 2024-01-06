@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "apkinfo-parser",
-    "version": "0.0.0"
+    "version": "0.0.2"
   },
   "tauri": {
     "allowlist": {
@@ -47,7 +47,8 @@
         "title": "APK信息解析",
         "width": 950,
         "center": true,
-        "height": 650
+        "height": 650,
+        "visible": false
       }
     ]
   }

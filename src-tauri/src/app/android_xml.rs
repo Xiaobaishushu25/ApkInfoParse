@@ -1,12 +1,12 @@
 pub mod axml {
     use axmldecoder::{Cdata, Element, Node};
 
-    pub fn extract_xml(content: Vec<u8>) -> String {
-        let xml = axmldecoder::parse(content.as_slice()).unwrap();
+    pub fn extract_xml(content: Vec<u8>) -> Result<String,String> {
+        let xml = axmldecoder::parse(content.as_slice()).map_err(|e|e.to_string())?;
         let root = xml.get_root().as_ref().unwrap();
         let mut xml_as_string = String::new();
         format_xml(root, 0_usize, &mut xml_as_string);
-        xml_as_string
+        Ok(xml_as_string)
     }
 
     fn format_xml(e: &Node, level: usize, output: &mut String) {

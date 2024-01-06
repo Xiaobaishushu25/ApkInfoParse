@@ -7,6 +7,7 @@ import {invoke} from '@tauri-apps/api'
 import { listen } from '@tauri-apps/api/event'
 import {ApkInfo} from "./apk_info.ts";
 import ApkInfoCp from "./components/ApkInfoCp.vue";
+import CustomAlert from "./components/CustomAlert.vue";
 // export type apk_info = {
 //   package_name:string,
 //   version_code: string,
@@ -20,6 +21,8 @@ import ApkInfoCp from "./components/ApkInfoCp.vue";
 // }
 
 const apkInfoList = ref<ApkInfo[]>([])
+const visible = ref<boolean>(false)
+const errMessage = ref<string>("")
 onMounted(async () => {
   // await appWindow.onResized(({payload: size}) => {
   await listen('tauri://file-drop', event => {
@@ -54,7 +57,14 @@ function handleFiles(files:string[]) {
     invoke<ApkInfo>('parse_by_path',{path:path}).then((response)=>{
       apkInfoList.value.push(response)
     }).catch((err)=>{
-      console.log(err)
+      console.log(err.msg)
+      errMessage.value = err.msg
+      if (!visible.value){
+        visible.value = true
+        setTimeout(()=>{
+          visible.value = false
+        },5000)
+      }
     })
   }
 }
@@ -64,7 +74,7 @@ async function openFileChoose(){
     multiple:true,
     filters:[{
       name:"apk",
-      extensions:["apk","apk.1"]
+      extensions:["apk","apk.1","APK"]
     }]
   })
   console.log(`选择pdf${files}`)
@@ -79,6 +89,7 @@ function clearChoose(){
 </script>
 
 <template>
+  <CustomAlert class="alert" v-if="visible" :message="errMessage"></CustomAlert>
   <div class="container" @drop.prevent @dragover.prevent @dragenter.prevent>
     <div class="button-container">
       <button class="select-button" @click="openFileChoose">选择apk</button>
@@ -91,6 +102,9 @@ function clearChoose(){
 </template>
 
 <style>
+.alert{
+  margin-top: 100px;
+}
 .container {
   display: flex;
   flex-direction: column;
